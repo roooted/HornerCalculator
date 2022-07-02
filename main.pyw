@@ -111,6 +111,53 @@ def nod(lst): # Функция для нахождения НОД от зада�
     return top_d
 
 
+def convert_odds(odds) -> list:
+    odds = odds.replace('+', ' + ').replace('-', ' - ')
+    odds = odds.split()
+    odds_pow = []
+
+    # Удаляем из массива odds все, кроме коэффициентов
+    for i in range(len(odds)):
+        if '^' in odds[i]:
+            if odds[i][-2].isdigit():
+                labby['text'] += 'Наивысшая степень не может быть больше 9-ой'
+                labby['fg'] = 'red'
+                return
+            odds_pow.append(int(odds[i][-1]))
+            odds[i] = odds[i][:-3]
+
+        elif 'x' in odds[i]:
+            odds[i] = odds[i][:-1]
+            odds_pow.append(1)
+
+        elif odds[i].isdigit():
+            odds_pow.append(0)
+
+        if odds[i] == '':
+            odds[i] = '1'
+
+    # Добавим "-" к отрицательным коэффициентам
+    for i in range(1, len(odds)):
+        if odds[i-1] == '-':
+            odds[i] = '-' + odds[i]
+    odds = list(map(int, odds[::2]))
+
+    # Создадим словарь "data" вида {"степень": "коэффициент", ...}
+    data = dict(zip(odds_pow, odds))
+
+    # В массив "helpy" добавим все коэффициенты, включая нули
+    helpy = []
+    for p in range(max(odds_pow), -1, -1):
+        if p in odds_pow:
+            helpy.append(data[p])
+        else:
+            helpy.append(0)       
+    odds = helpy
+    if len(odds) == 1:
+        raise ValueError
+    return odds
+
+
 # -------------------- Функция всего алгоритма -------------------- №
 powers = {0:'', 1:'', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'}
 def gorner():
@@ -122,49 +169,7 @@ def gorner():
 
     try: # Проверка на корректные символы
         if flag_var.get() == 'full': # Если уравнение вводилось в общем виде
-            odds = odds.replace('+', ' + ').replace('-', ' - ')
-            odds = odds.split()
-            odds_pow = []
-
-            # Удаляем из массива odds все, кроме коэффициентов
-            for i in range(len(odds)):
-                if '^' in odds[i]:
-                    if odds[i][-2].isdigit():
-                        labby['text'] += 'Наивысшая степень не может быть больше 9-ой'
-                        labby['fg'] = 'red'
-                        return
-                    odds_pow.append(int(odds[i][-1]))
-                    odds[i] = odds[i][:-3]
-
-                elif 'x' in odds[i]:
-                    odds[i] = odds[i][:-1]
-                    odds_pow.append(1)
-
-                elif odds[i].isdigit():
-                    odds_pow.append(0)
-
-                if odds[i] == '':
-                    odds[i] = '1'
-
-            # Добавим "-" к отрицательным коэффициентам
-            for i in range(1, len(odds)):
-                if odds[i-1] == '-':
-                    odds[i] = '-' + odds[i]
-            odds = list(map(int, odds[::2]))
-
-            # Создадим словарь "data" вида {"степень": "коэффициент", ...}
-            data = dict(zip(odds_pow, odds))
-
-            # В массив "helpy" добавим все коэффициенты, включая нули
-            helpy = []
-            for p in range(max(odds_pow), -1, -1):
-                if p in odds_pow:
-                    helpy.append(data[p])
-                else:
-                    helpy.append(0)       
-            odds = helpy
-            if len(odds) == 1:
-                raise ValueError
+            odds = convert_odds(odds)
         else:
             odds = list(map(int, odds.split()))
 
